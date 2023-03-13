@@ -1,22 +1,44 @@
+import axios from "axios"
+import { useEffect, useState } from "react"
 import {CiEdit} from "react-icons/ci"
 import {MdOutlineDelete} from "react-icons/md"
-import { useEffect, useState } from "react"
-import axios from "axios"
-
-import { getUserBlog } from "../Utils/APIendpoints"
+import { Navigate, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
+import { toast } from "react-toastify"
+import { useCallback } from 'react';
+ 
 
 function BlogList(){
-    const [blogs,setBlogs] = useState([])
+    const Navigate= useNavigate();
+   const [blogs,setBlogs]= useState([])
+    const token= localStorage.getItem("token")
+
+    const handleOnSubmit = useCallback(blogs => {
+      const id = blogs._id
+      axios.delete(`http://localhost:8000/post/delete/${id}` )
+      .then(()=>{
+          
+          toast.success("your blog is deleted");
+           
+          }).catch(()=>{ 
+              toast.error("oops we have error!");
     
-    useEffect(()=>{
-        getUserBlog()
-        .then((res)=>{
-            setBlogs(res.data.blogs);
-        })
-        .catch((e)=>{
-            console.log(e);
-        })
-    },[])
+              })
+    }, []);
+
+ 
+
+
+     useEffect(()=>{
+     axios.get(`http://localhost:8000/post/userblogs`,{headers:{
+       authorization:token
+     }}).then((res)=>{
+      setBlogs(res.data.message)
+    // console.log(res)
+     }).catch((e)=>{
+        console.log(e);
+     })
+     } ,[])
     return(
     <div className="mt-5">
        <table className="table-auto w-full">
@@ -27,15 +49,20 @@ function BlogList(){
             <th>Delete</th>
             </tr>
         </thead>
-        <tbody>
-            {blogs.map((blog)=>
-                <tr className="border-y h-10">
-                <td>{blog.Title}</td>
-                <td><CiEdit className="text-blue-800"/></td>
-                <td><MdOutlineDelete className="text-red-500"/></td>
-                </tr>
-             )}
-        </tbody>
+        {blogs.map((blogs)=>
+          <tbody>
+              <tr className="border-y h-10">
+              <td> {blogs.Title}</td>
+           
+              <td>    <Link to={"/post"} state={{
+                    blog: blogs._id
+              }}> <CiEdit className="text-blue-800"   /> </Link></td>
+              
+              <td><MdOutlineDelete className="text-red-500" item={blogs} onClick={()=> handleOnSubmit(blogs)} /></td>
+              </tr>
+          </tbody>
+   
+      )}
         </table>
     </div>
     )

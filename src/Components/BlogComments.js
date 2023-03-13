@@ -4,45 +4,33 @@ import { useContext } from "react"
 import axios from "axios"
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
-import jwt_decode from "jwt-decode"; 
-
+import { toast } from "react-toastify"
+ 
 
 function BlogComments(){
-    const {id} = useParams()
+    const  {id}= useParams()
    const {user} = useContext(UserContext)
    const [comment,setComment] = useState("")
    const [comments,setComments] =useState([])
    const [loading,setLoading] = useState(true)
    const token = localStorage.getItem("token")
 
-   const [image,setImage] = useState({});
+ 
 
 
-   if(user){
-     const token = localStorage.getItem("token")
-     const id = jwt_decode(token)
-     axios.get(`http://localhost:8000/auth/user/${id.id}`)
-     .then((res)=>{
-      
-      
-       setImage(res.data.user.image.url);
-     
-         }).catch((e)=>{ 
-              console.log(e);
-         })
-   }
-
+ 
    useEffect(()=>{
     axios.get(`http://localhost:8000/comment/getcomment/${id}`)
     .then((res)=>{
         setComments(res.data.comments);
         // console.log(res.data);
+
         setLoading(false)
     }).catch((e)=>{
         console.log("error");
     })
    },[])
-   if(loading) return
+
    function handleOnSubmit(){
 
         axios.post("http://localhost:8000/comment/create/",{
@@ -53,12 +41,14 @@ function BlogComments(){
                 authorization:token
             }
         }).then((res)=>{
-            console.log(res);
-            console.log(id);
+            toast.success(res.data.message);
+           
         }).catch((e)=>{
             console.log(e);
         })
    }
+
+   if(loading) return
     return (
         <div className="border-t py-5 px-16">
             <h1 className="font-bold text-2xl">Top comment(s)</h1>
@@ -75,7 +65,7 @@ function BlogComments(){
                 </div>
             </div>
             }
-            {comments.map((comment)=> <Comment data={comment}/> )}
+            {comments.map((comment)=> <Comment comments={comment}/> )}
              
             
         </div>

@@ -14,7 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useState, useEffect } from "react";
 import { UserContext } from "./Utils/UserContex";
 
-
+import EditBlog from "./Pages/EditBlog";
 function App() {
   const [loading, setLoading] = useState(true)
   const [user,setUser] = useState(false)
@@ -39,6 +39,7 @@ function App() {
           <Route path="/login" element={<Login/>} />
           <Route path="/signup" element={<Signup/>}/>
           <Route path="/blog/:id" element={<Blog/>}/>
+          <Route path="/post" element={<ProtectRoute> <EditBlog/></ProtectRoute>}/>
           <Route path="/dashboard" element={<ProtectRoute><Dashboard/></ProtectRoute>}/>
           <Route path="/new" element={<ProtectRoute><New/></ProtectRoute>}/>
           <Route path="/profile" element={<ProtectRoute><Profile/></ProtectRoute>}/>
